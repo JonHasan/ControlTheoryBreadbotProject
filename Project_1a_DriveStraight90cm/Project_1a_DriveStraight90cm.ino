@@ -61,22 +61,7 @@
       long rCount = 0;
       long targetCount;
       float numRev;
-    
-      // variables for tracking the left and right encoder counts
-      long prevlCount, prevrCount;
-    
-      long lDiff, rDiff;  // diff between current encoder count and previous count
-    
-      // variables for setting left and right motor power
-      int leftPower = motorPower;
-      int rightPower = motorPower;
-    
-      numRev = distance / wheelCirc;  // calculate the target # of rotations
-      targetCount = numRev * countsPerRev - 55;    // calculate the target count  1: Subtract 10 2: subtract 5
-    
-      // debug
-      Serial.print("driveStraight() ");
-      Serial.print(distance);
+    istance);
       Serial.print(" mm at ");
       Serial.print(motorPower);
       Serial.println(" power.");

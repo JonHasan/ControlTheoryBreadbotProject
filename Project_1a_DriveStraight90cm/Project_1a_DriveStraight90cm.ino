@@ -1,10 +1,10 @@
-   /// Project 1a Drive 90cm 
+  /// Project 1a Drive 90cm 
    /// Group: Steve, Jon, Matt
 
 
    /// Original Source taken from the following example in the Redbot library
    /// and modified by the project team
-    
+
     /***********************************************************************
      * Exp7_3_DriveStraight -- RedBot Experiment 7.3
      * 
@@ -19,30 +19,34 @@
      * 8 Oct 2013 M. Hord
      * Revised, 31 Oct 2014 B. Huang 
      ***********************************************************************/
+
+     /**************
+      * Project 1: Optimal parameters for good run found to be targetcount = targetcount - 30, speed 160 (for now), offset 4 
+      */
     #include <RedBot.h>
     RedBotMotors motors;
-    
+
     RedBotEncoder encoder = RedBotEncoder(A2, A3);
     int buttonPin = 12;
     int countsPerRev = 192;   // 4 pairs of N-S x 48:1 gearbox = 192 ticks per wheel rev
-    
-    float wheelDiam = 65;  // diam = 65mm            
+
+    float wheelDiam = 65;  // diam = 65mm 
     float wheelCirc = PI*wheelDiam;  // Redbot wheel circumference = pi*D
     const float finalDistance = 900; // 90 cm, or 900 mm
     const float slowingDistance = 900;
-    const float stopDistance = 50;
-    const int initialSpeed = 180;
-    const int slowingSpeed = 100;
+   // const float stopDistance = 880;
+    const int initialSpeed = 160;
+    //const int slowingSpeed = 100;
       // variable used to offset motor power on right vs left to keep straight.
-    const int offset = 4;  // offset amount to compensate Right vs. Left drive   Changed from 5 to 4 
+    const int offset = 4;  // offset amount to compensate Right vs. Left drive
     const int motorDelay = 50; // small time delay to allow motors to respond to offset change
-      
+
     void setup()
     {
       pinMode(buttonPin, INPUT_PULLUP);
       Serial.begin(9600);
     }
-    
+
     void loop(void)
     {
       // set the power for left & right motors on button press
@@ -54,34 +58,49 @@
         motors.brake();  
       }
     }
-    
+
     void driveStraight(float distance, int motorPower)
     {
       long lCount = 0;
       long rCount = 0;
       long targetCount;
       float numRev;
-    istance);
+
+      // variables for tracking the left and right encoder counts
+      long prevlCount, prevrCount;
+
+      long lDiff, rDiff;  // diff between current encoder count and previous count
+
+      // variables for setting left and right motor power
+      int leftPower = motorPower;
+      int rightPower = motorPower;
+
+      numRev = distance / wheelCirc;  // calculate the target # of rotations
+      targetCount = numRev * countsPerRev - 38;    // calculate the target count
+
+      // debug
+      Serial.print("driveStraight() ");
+      Serial.print(distance);
       Serial.print(" mm at ");
       Serial.print(motorPower);
       Serial.println(" power.");
-    
+
       Serial.print("Target: ");
       Serial.print(numRev, 3);
       Serial.println(" revolutions.");
       Serial.println();
-      
+
       // print out header
       Serial.print("Left\t");   // "Left" and tab
       Serial.print("Right\t");  // "Right" and tab
       Serial.println("Target count");
       Serial.println("============================");
-    
+
       encoder.clearEnc(BOTH);    // clear the encoder count
       delay(100);  // short delay before starting the motors.
-      
+
       motors.drive(motorPower);  // start motors 
-    
+
       while (rCount < targetCount)
       {
         // while the right encoder is less than the target count -- debug print 
@@ -93,18 +112,18 @@
         Serial.print(rCount);
         Serial.print("\t");
         Serial.println(targetCount);
-    
+
         motors.leftDrive(leftPower);
         motors.rightDrive(rightPower);
-    
+
         // calculate the rotation "speed" as a difference in the count from previous cycle.
         lDiff = (lCount - prevlCount);
         rDiff = (rCount - prevrCount);
-    
+
         // store the current count as the "previous" count for the next cycle.
         prevlCount = lCount;
         prevrCount = rCount;
-    
+
         // if left is faster than the right, slow down the left / speed up right
         if (lDiff > rDiff) 
         {
